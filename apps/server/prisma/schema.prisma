@@ -1,0 +1,450 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  client
+  master
+  admin
+  owner
+}
+
+enum BookingStatus {
+  pending_confirmation
+  confirmed
+  deposit_pending
+  deposit_paid
+  in_progress
+  completed
+  cancelled_by_client
+  cancelled_by_admin
+  no_show
+}
+
+enum PaymentType {
+  deposit
+  full
+  refund
+}
+
+enum PaymentStatus {
+  pending
+  success
+  failed
+  refunded
+}
+
+enum NotificationType {
+  booking_created
+  booking_confirmed
+  booking_cancelled
+  reminder_24h
+  reminder_2h
+  review_request
+  promotion
+  schedule_daily
+  waitlist_available
+}
+
+enum NotificationStatus {
+  pending
+  sent
+  failed
+}
+
+enum ReviewStatus {
+  pending
+  approved
+  rejected
+}
+
+enum DiscountType {
+  percent
+  fixed
+}
+
+enum WaitlistStatus {
+  active
+  notified
+  booked
+  expired
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+model User {
+  id                String    @id @default(uuid())
+  telegramId        BigInt    @unique @map("telegram_id")
+  telegramUsername   String?   @map("telegram_username")
+  firstName         String?   @map("first_name")
+  lastName          String?   @map("last_name")
+  phone             String?
+  avatarUrl         String?   @map("avatar_url")
+  role              UserRole  @default(client)
+  language          String    @default("uk")
+  isActive          Boolean   @default(true) @map("is_active")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  master            Master?
+  bookings          Booking[]
+  reviews           Review[]
+  loyaltyStamps     LoyaltyStamp[]
+  payments          Payment[]
+  notifications     Notification[]
+  waitlistEntries   Waitlist[]
+
+  @@map("users")
+}
+
+model ServiceCategory {
+  id          String    @id @default(uuid())
+  parentId    String?   @map("parent_id")
+  name        Json      // { "uk": "...", "en": "...", "ru": "..." }
+  description Json?     // { "uk": "...", "en": "...", "ru": "..." }
+  imageUrl    String?   @map("image_url")
+  sortOrder   Int       @default(0) @map("sort_order")
+  isActive    Boolean   @default(true) @map("is_active")
+
+  // Relations
+  parent      ServiceCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    ServiceCategory[] @relation("CategoryHierarchy")
+  services    Service[]
+
+  @@map("service_categories")
+}
+
+model Service {
+  id                    String    @id @default(uuid())
+  categoryId            String?   @map("category_id")
+  name                  Json      // { "uk": "...", "en": "...", "ru": "..." }
+  description           Json?     // { "uk": "...", "en": "...", "ru": "..." }
+  imageUrl              String?   @map("image_url")
+  requiresConfirmation  Boolean   @default(false) @map("requires_confirmation")
+  isActive              Boolean   @default(true) @map("is_active")
+  sortOrder             Int       @default(0) @map("sort_order")
+  createdAt             DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  category        ServiceCategory?  @relation(fields: [categoryId], references: [id])
+  durations       ServiceDuration[]
+  masterServices  MasterService[]
+  bookingItems    BookingItem[]
+  comboItems      ComboItem[]
+  waitlistEntries Waitlist[]
+
+  @@map("services")
+}
+
+model ServiceDuration {
+  id              String    @id @default(uuid())
+  serviceId       String    @map("service_id")
+  durationMinutes Int       @map("duration_minutes")
+  basePrice       Decimal   @map("base_price") @db.Decimal(10, 2)
+  isActive        Boolean   @default(true) @map("is_active")
+
+  // Relations
+  service       Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  bookingItems  BookingItem[]
+  comboItems    ComboItem[]
+
+  @@map("service_durations")
+}
+
+model Master {
+  id              String    @id @default(uuid())
+  userId          String    @unique @map("user_id")
+  displayName     Json      // { "uk": "...", "en": "...", "ru": "..." }
+  bio             Json?     // { "uk": "...", "en": "...", "ru": "..." }
+  photoUrl        String?   @map("photo_url")
+  specialization  String?
+  isActive        Boolean   @default(true) @map("is_active")
+  sortOrder       Int       @default(0) @map("sort_order")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user              User                @relation(fields: [userId], references: [id])
+  masterServices    MasterService[]
+  schedules         MasterSchedule[]
+  bookings          Booking[]
+  reviews           Review[]
+  waitlistEntries   Waitlist[]
+  calendarSync      GoogleCalendarSync?
+
+  @@map("masters")
+}
+
+model MasterService {
+  id            String    @id @default(uuid())
+  masterId      String    @map("master_id")
+  serviceId     String    @map("service_id")
+  priceModifier Decimal   @default(0) @map("price_modifier") @db.Decimal(10, 2)
+
+  // Relations
+  master  Master  @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([masterId, serviceId])
+  @@map("master_services")
+}
+
+model MasterSchedule {
+  id        String    @id @default(uuid())
+  masterId  String    @map("master_id")
+  workDate  DateTime  @map("work_date") @db.Date
+  startTime String    @map("start_time") // "09:00"
+  endTime   String    @map("end_time")   // "18:00"
+  isDayOff  Boolean   @default(false) @map("is_day_off")
+
+  // Relations
+  master Master @relation(fields: [masterId], references: [id], onDelete: Cascade)
+
+  @@unique([masterId, workDate])
+  @@index([masterId, workDate])
+  @@map("master_schedules")
+}
+
+model Combo {
+  id              String    @id @default(uuid())
+  name            Json      // { "uk": "...", "en": "...", "ru": "..." }
+  description     Json?     // { "uk": "...", "en": "...", "ru": "..." }
+  imageUrl        String?   @map("image_url")
+  discountPercent Decimal   @default(0) @map("discount_percent") @db.Decimal(5, 2)
+  isActive        Boolean   @default(true) @map("is_active")
+  sortOrder       Int       @default(0) @map("sort_order")
+
+  // Relations
+  items ComboItem[]
+
+  @@map("combos")
+}
+
+model ComboItem {
+  id          String  @id @default(uuid())
+  comboId     String  @map("combo_id")
+  serviceId   String  @map("service_id")
+  durationId  String  @map("duration_id")
+  sortOrder   Int     @default(0) @map("sort_order")
+
+  // Relations
+  combo     Combo           @relation(fields: [comboId], references: [id], onDelete: Cascade)
+  service   Service         @relation(fields: [serviceId], references: [id])
+  duration  ServiceDuration @relation(fields: [durationId], references: [id])
+
+  @@map("combo_items")
+}
+
+model Booking {
+  id              String        @id @default(uuid())
+  userId          String        @map("user_id")
+  masterId        String?       @map("master_id")
+  bookingDate     DateTime      @map("booking_date") @db.Date
+  startTime       String        @map("start_time") // "10:00"
+  endTime         String        @map("end_time")   // "11:30"
+  status          BookingStatus @default(pending_confirmation)
+  totalPrice      Decimal       @map("total_price") @db.Decimal(10, 2)
+  depositAmount   Decimal?      @map("deposit_amount") @db.Decimal(10, 2)
+  depositPercent  Decimal?      @map("deposit_percent") @db.Decimal(5, 2)
+  promoCodeId     String?       @map("promo_code_id")
+  discountAmount  Decimal       @default(0) @map("discount_amount") @db.Decimal(10, 2)
+  adminNotes      String?       @map("admin_notes")
+  cancelReason    String?       @map("cancel_reason")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  user          User          @relation(fields: [userId], references: [id])
+  master        Master?       @relation(fields: [masterId], references: [id])
+  promoCode     PromoCode?    @relation(fields: [promoCodeId], references: [id])
+  items         BookingItem[]
+  payments      Payment[]
+  notifications Notification[]
+  review        Review?
+  loyaltyStamp  LoyaltyStamp?
+
+  @@index([masterId, bookingDate, status])
+  @@index([userId, createdAt])
+  @@map("bookings")
+}
+
+model BookingItem {
+  id          String  @id @default(uuid())
+  bookingId   String  @map("booking_id")
+  serviceId   String  @map("service_id")
+  durationId  String  @map("duration_id")
+  price       Decimal @db.Decimal(10, 2)
+  sortOrder   Int     @default(0) @map("sort_order")
+
+  // Relations
+  booking   Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  service   Service         @relation(fields: [serviceId], references: [id])
+  duration  ServiceDuration @relation(fields: [durationId], references: [id])
+
+  @@map("booking_items")
+}
+
+model Payment {
+  id               String        @id @default(uuid())
+  bookingId        String        @map("booking_id")
+  userId           String        @map("user_id")
+  amount           Decimal       @db.Decimal(10, 2)
+  type             PaymentType
+  status           PaymentStatus @default(pending)
+  providerTxId     String?       @map("provider_tx_id")
+  providerResponse Json?         @map("provider_response")
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@map("payments")
+}
+
+model Review {
+  id        String       @id @default(uuid())
+  userId    String       @map("user_id")
+  masterId  String       @map("master_id")
+  bookingId String       @unique @map("booking_id")
+  rating    Int          // 1-5
+  comment   String?
+  status    ReviewStatus @default(pending)
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id])
+  master  Master  @relation(fields: [masterId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@map("reviews")
+}
+
+model PromoCode {
+  id             String       @id @default(uuid())
+  createdAt      DateTime     @default(now()) @map("created_at")
+  code           String       @unique
+  discountType   DiscountType @map("discount_type")
+  discountValue  Decimal      @map("discount_value") @db.Decimal(10, 2)
+  minOrderAmount Decimal?     @map("min_order_amount") @db.Decimal(10, 2)
+  maxUses        Int?         @map("max_uses")
+  currentUses    Int          @default(0) @map("current_uses")
+  validFrom      DateTime     @map("valid_from")
+  validUntil     DateTime     @map("valid_until")
+  isActive       Boolean      @default(true) @map("is_active")
+
+  // Relations
+  bookings Booking[]
+
+  @@map("promo_codes")
+}
+
+model LoyaltyStamp {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  bookingId   String   @unique @map("booking_id")
+  stampNumber Int      @map("stamp_number")
+  isReward    Boolean  @default(false) @map("is_reward")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@map("loyalty_stamps")
+}
+
+model LoyaltySettings {
+  id               String  @id @default(uuid())
+  stampsForReward  Int     @map("stamps_for_reward")
+  eligibleServices Json?   @map("eligible_services") // Array of service IDs
+  isActive         Boolean @default(true) @map("is_active")
+
+  @@map("loyalty_settings")
+}
+
+model Notification {
+  id          String             @id @default(uuid())
+  userId      String             @map("user_id")
+  bookingId   String?            @map("booking_id")
+  type        NotificationType
+  status      NotificationStatus @default(pending)
+  payload     Json?
+  scheduledAt DateTime           @map("scheduled_at")
+  sentAt      DateTime?          @map("sent_at")
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id])
+  booking Booking? @relation(fields: [bookingId], references: [id])
+
+  @@index([scheduledAt, status])
+  @@map("notifications")
+}
+
+model Waitlist {
+  id             String         @id @default(uuid())
+  userId         String         @map("user_id")
+  serviceId      String         @map("service_id")
+  masterId       String?        @map("master_id")
+  preferredDate  DateTime       @map("preferred_date") @db.Date
+  preferredStart String?        @map("preferred_start") // "10:00"
+  preferredEnd   String?        @map("preferred_end")   // "14:00"
+  status         WaitlistStatus @default(active)
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id])
+  service Service  @relation(fields: [serviceId], references: [id])
+  master  Master?  @relation(fields: [masterId], references: [id])
+
+  @@map("waitlist")
+}
+
+model Promotion {
+  id          String   @id @default(uuid())
+  title       Json     // { "uk": "...", "en": "...", "ru": "..." }
+  description Json?    // { "uk": "...", "en": "...", "ru": "..." }
+  imageUrl    String?  @map("image_url")
+  startDate   DateTime @map("start_date")
+  endDate     DateTime @map("end_date")
+  isActive    Boolean  @default(true) @map("is_active")
+  sortOrder   Int      @default(0) @map("sort_order")
+
+  @@map("promotions")
+}
+
+model SiteSettings {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+model GoogleCalendarSync {
+  id            String   @id @default(uuid())
+  masterId      String   @unique @map("master_id")
+  accessToken   String   @map("access_token")
+  refreshToken  String   @map("refresh_token")
+  calendarId    String?  @map("calendar_id")
+  lastSyncAt    DateTime @map("last_sync_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  master Master @relation(fields: [masterId], references: [id], onDelete: Cascade)
+
+  @@map("google_calendar_syncs")
+}

@@ -1,0 +1,129 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "error": "Something went wrong",
+        "retry": "Try again",
+        "save": "Save",
+        "cancel": "Cancel",
+        "back": "Back",
+        "next": "Next",
+        "confirm": "Confirm",
+        "close": "Close",
+        "search": "Search",
+        "noResults": "No results found"
+    },
+    "nav": {
+        "home": "Home",
+        "booking": "Booking",
+        "waitlist": "Waitlist",
+        "profile": "Profile"
+    },
+    "home": {
+        "hero": {
+            "title": "Your Space for Relaxation",
+            "subtitle": "Professional massage and SPA treatments",
+            "cta": "Book Now"
+        },
+        "about": {
+            "title": "About Us",
+            "description": "We are a team of professional massage therapists who will help you restore your energy and find harmony of body and soul."
+        },
+        "promotions": {
+            "title": "Promotions"
+        },
+        "services": {
+            "title": "Our Services",
+            "from": "from"
+        },
+        "masters": {
+            "title": "Our Masters",
+            "reviews": "reviews"
+        },
+        "reviews": {
+            "title": "Client Reviews"
+        },
+        "map": {
+            "title": "How to Find Us"
+        }
+    },
+    "booking": {
+        "title": "Book an Appointment",
+        "steps": {
+            "service": "Service",
+            "master": "Master",
+            "datetime": "Date & Time",
+            "confirm": "Confirmation"
+        },
+        "selectService": "Select a service",
+        "selectDuration": "Select duration",
+        "selectMaster": "Select a master",
+        "anyMaster": "Any available master",
+        "selectDate": "Select a date",
+        "selectTime": "Select a time",
+        "noSlots": "No available slots for this date",
+        "summary": "Summary",
+        "promoCode": "Promo code",
+        "apply": "Apply",
+        "total": "Total",
+        "deposit": "Deposit",
+        "payAndBook": "Pay & Book",
+        "success": "Booking Created!",
+        "successMessage": "You have been successfully booked. Please wait for confirmation."
+    },
+    "profile": {
+        "title": "Profile",
+        "editProfile": "Edit Profile",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "phone": "Phone",
+        "telegram": "Telegram",
+        "language": "Language",
+        "guest": "Guest",
+        "loyalty": {
+            "title": "Loyalty Program",
+            "stamps": "stamps",
+            "nextReward": "Until free visit",
+            "rewards": "Rewards earned"
+        },
+        "history": {
+            "title": "Visit History",
+            "noVisits": "You have no visits yet",
+            "rebook": "Rebook",
+            "status": {
+                "completed": "Completed",
+                "cancelled": "Cancelled",
+                "cancelledByAdmin": "Cancelled by admin",
+                "noShow": "No show",
+                "pending": "Pending confirmation",
+                "confirmed": "Confirmed",
+                "inProgress": "In progress"
+            }
+        }
+    },
+    "waitlist": {
+        "title": "Waitlist",
+        "subtitle": "Be the first to know about available slots",
+        "add": "Add to waitlist",
+        "added": "You've been added to the waitlist",
+        "removed": "You've been removed from the waitlist",
+        "service": "Service",
+        "selectService": "Select a service",
+        "master": "Master",
+        "anyMaster": "Any master",
+        "preferredDate": "Preferred date",
+        "preferredStart": "Preferred time (from)",
+        "preferredEnd": "Preferred time (to)",
+        "submit": "Add",
+        "myEntries": "My entries",
+        "empty": "You haven't added yourself to the waitlist yet",
+        "confirmDelete": "Remove from queue?",
+        "remove": "Remove",
+        "bookNow": "Book now!",
+        "status": {
+            "active": "Waiting",
+            "notified": "Slot available!",
+            "booked": "Booked",
+            "expired": "Expired"
+        }
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "name": "massage-bot",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Telegram Mini App for massage salon booking",
+    "scripts": {
+        "dev": "pnpm --parallel -r run dev",
+        "dev:bot": "pnpm --filter @massage-bot/server run dev",
+        "dev:web": "pnpm --filter @massage-bot/web run dev",
+        "build": "pnpm -r run build",
+        "build:bot": "pnpm --filter @massage-bot/server run build",
+        "build:web": "pnpm --filter @massage-bot/web run build",
+        "lint": "pnpm -r run lint",
+        "db:migrate": "pnpm --filter @massage-bot/server run db:migrate",
+        "db:seed": "pnpm --filter @massage-bot/server run db:seed",
+        "db:studio": "pnpm --filter @massage-bot/server run db:studio"
+    },
+    "engines": {
+        "node": ">=20.0.0",
+        "pnpm": ">=9.0.0"
+    }
+}
