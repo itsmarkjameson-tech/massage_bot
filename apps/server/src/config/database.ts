@@ -20,7 +20,7 @@ if (env.NODE_ENV !== 'production') {
  * Fastify plugin for Prisma client
  * Exposes prisma as decorator on fastify instance
  */
-async function prismaPlugin(fastify: any) {
+async function prismaPluginFn(fastify: any) {
     fastify.decorate('prisma', prisma);
 
     fastify.addHook('onClose', async () => {
@@ -28,7 +28,7 @@ async function prismaPlugin(fastify: any) {
     });
 }
 
-export const prismaPlugin = fp(prismaPlugin, {
+export const prismaPlugin = fp(prismaPluginFn, {
     name: 'prismaPlugin',
     fastify: '4.x',
 });
