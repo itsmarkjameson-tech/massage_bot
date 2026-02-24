@@ -1,18 +1,19 @@
 FROM node:20-alpine
 
-# Install pnpm globally
+# Install pnpm
 RUN npm install -g pnpm
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json pnpm-lock.yaml ./
+# Copy package files from root
+COPY pnpm-lock.yaml package.json pnpm-workspace.yaml ./
+COPY apps/server/package.json apps/server/
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile --prod=false
+RUN pnpm install --frozen-lockfile
 
-# Copy source code
-COPY . .
+# Copy server source
+COPY apps/server ./
 
 # Generate Prisma client
 RUN pnpm prisma generate
@@ -24,4 +25,4 @@ RUN pnpm build
 EXPOSE 3000
 
 # Start command
-CMD ["node", "dist/server.js"]
+CMD ["pnpm", "start"]
