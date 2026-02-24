@@ -2,7 +2,9 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '../../config/database.js';
 import { requireRole } from '../../shared/middleware/auth.middleware.js';
-import { ReviewStatus } from '@prisma/client';
+
+// Local type since Prisma client may not be generated
+export type ReviewStatus = 'pending' | 'approved' | 'rejected';
 
 // Validation schemas
 const paginationSchema = z.object({

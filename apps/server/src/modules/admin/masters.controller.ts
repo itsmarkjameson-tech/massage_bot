@@ -1,8 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '../../config/database.js';
-import { requireRole } from '../../shared/middleware/auth.middleware.js';
-import { UserRole } from '@prisma/client';
+import { requireRole, type UserRole } from '../../shared/middleware/auth.middleware.js';
 
 // Validation schemas
 const masterCreateSchema = z.object({

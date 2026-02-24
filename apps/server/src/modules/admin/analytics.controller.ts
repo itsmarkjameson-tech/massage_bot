@@ -2,7 +2,18 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '../../config/database.js';
 import { requireRole } from '../../shared/middleware/auth.middleware.js';
-import { BookingStatus } from '@prisma/client';
+
+// Local type since Prisma client may not be generated
+export type BookingStatus =
+    | 'pending_confirmation'
+    | 'confirmed'
+    | 'deposit_pending'
+    | 'deposit_paid'
+    | 'in_progress'
+    | 'completed'
+    | 'cancelled_by_client'
+    | 'cancelled_by_admin'
+    | 'no_show';
 
 const dateRangeSchema = z.object({
     startDate: z.string().optional(),

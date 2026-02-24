@@ -2,7 +2,9 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '../../config/database.js';
 import { requireRole } from '../../shared/middleware/auth.middleware.js';
-import { DiscountType } from '@prisma/client';
+
+// Local type since Prisma client may not be generated
+export type DiscountType = 'percent' | 'fixed';
 
 // Validation schemas
 const promoCodeCreateSchema = z.object({
@@ -202,8 +204,8 @@ export async function adminPromoCodesRoutes(app: FastifyInstance) {
         }
 
         const updateData: any = { ...data };
-        if (data.validFrom) updateData.validFrom = new Date(data.validFrom);
-        if (data.validUntil) updateData.validUntil = new Date(data.validUntil);
+        if (data.validFrom) updateData.validFrom = new Date(data.validFrom as string);
+        if (data.validUntil) updateData.validUntil = new Date(data.validUntil as string);
 
         const promoCode = await prisma.promoCode.update({
             where: { id },

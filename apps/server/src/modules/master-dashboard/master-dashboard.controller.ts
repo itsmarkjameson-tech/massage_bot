@@ -79,7 +79,7 @@ async function calculateIncome(masterId: string, startDate: Date, endDate: Date)
         },
         select: { totalPrice: true },
     });
-    return bookings.reduce((sum, b) => sum + Number(b.totalPrice), 0);
+    return bookings.reduce((sum: number, b: any) => sum + Number(b.totalPrice), 0);
 }
 
 export async function masterDashboardRoutes(app: FastifyInstance) {

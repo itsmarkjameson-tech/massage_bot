@@ -193,7 +193,7 @@ export async function bookingsRoutes(app: FastifyInstance) {
             select: { startTime: true, endTime: true },
         });
 
-        const hasConflict = existingBookings.some((booking) => {
+        const hasConflict = existingBookings.some((booking: any) => {
             const bookingStart = timeToMinutes(booking.startTime);
             const bookingEnd = timeToMinutes(booking.endTime);
             const newStart = timeToMinutes(startTime);
@@ -252,7 +252,7 @@ export async function bookingsRoutes(app: FastifyInstance) {
         const bookingStatus: 'pending_confirmation' = 'pending_confirmation';
 
         // Create booking with items in transaction
-        const booking = await prisma.$transaction(async (tx) => {
+        const booking = await prisma.$transaction(async (tx: any) => {
             // Create booking
             const newBooking = await tx.booking.create({
                 data: {
@@ -313,7 +313,7 @@ export async function bookingsRoutes(app: FastifyInstance) {
         });
 
         // Відправити сповіщення про створення бронювання
-        const services = booking.items.map(item => (item.service.name as any)?.uk || String(item.service.name)).join(', ');
+        const services = booking.items.map((item: any) => (item.service.name as any)?.uk || String(item.service.name)).join(', ');
         const masterName = (booking.master?.displayName as any)?.uk || '';
 
         sendNotification({
