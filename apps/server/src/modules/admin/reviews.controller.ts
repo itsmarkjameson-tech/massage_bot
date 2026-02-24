@@ -3,8 +3,14 @@ import { z } from 'zod';
 import { prisma } from '../../config/database.js';
 import { requireRole } from '../../shared/middleware/auth.middleware.js';
 
-// Local type since Prisma client may not be generated
-export type ReviewStatus = 'pending' | 'approved' | 'rejected';
+// Local enum since Prisma client may not be generated
+const ReviewStatus = {
+    pending: 'pending',
+    approved: 'approved',
+    rejected: 'rejected',
+} as const;
+
+export type ReviewStatus = typeof ReviewStatus[keyof typeof ReviewStatus];
 
 // Validation schemas
 const paginationSchema = z.object({

@@ -3,8 +3,13 @@ import { z } from 'zod';
 import { prisma } from '../../config/database.js';
 import { requireRole } from '../../shared/middleware/auth.middleware.js';
 
-// Local type since Prisma client may not be generated
-export type DiscountType = 'percent' | 'fixed';
+// Local enum since Prisma client may not be generated
+const DiscountType = {
+    percent: 'percent',
+    fixed: 'fixed',
+} as const;
+
+export type DiscountType = typeof DiscountType[keyof typeof DiscountType];
 
 // Validation schemas
 const promoCodeCreateSchema = z.object({

@@ -1,7 +1,17 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '../../config/database.js';
-import { requireRole, type UserRole } from '../../shared/middleware/auth.middleware.js';
+import { requireRole } from '../../shared/middleware/auth.middleware.js';
+
+// Local enum since Prisma client may not be generated
+const UserRole = {
+    client: 'client',
+    master: 'master',
+    admin: 'admin',
+    owner: 'owner',
+} as const;
+
+export type UserRole = typeof UserRole[keyof typeof UserRole];
 
 // Validation schemas
 const masterCreateSchema = z.object({

@@ -4,17 +4,20 @@ import { prisma } from '../../config/database.js';
 import { requireRole } from '../../shared/middleware/auth.middleware.js';
 import { checkWaitlistAndNotify } from '../waitlist/waitlist.controller.js';
 
-// Local type since Prisma client may not be generated
-export type BookingStatus =
-    | 'pending_confirmation'
-    | 'confirmed'
-    | 'deposit_pending'
-    | 'deposit_paid'
-    | 'in_progress'
-    | 'completed'
-    | 'cancelled_by_client'
-    | 'cancelled_by_admin'
-    | 'no_show';
+// Local enum since Prisma client may not be generated
+const BookingStatus = {
+    pending_confirmation: 'pending_confirmation',
+    confirmed: 'confirmed',
+    deposit_pending: 'deposit_pending',
+    deposit_paid: 'deposit_paid',
+    in_progress: 'in_progress',
+    completed: 'completed',
+    cancelled_by_client: 'cancelled_by_client',
+    cancelled_by_admin: 'cancelled_by_admin',
+    no_show: 'no_show',
+} as const;
+
+export type BookingStatus = typeof BookingStatus[keyof typeof BookingStatus];
 
 // Validation schemas
 const bookingFiltersSchema = z.object({
