@@ -29,8 +29,8 @@ export async function mastersRoutes(app: FastifyInstance) {
         });
 
         // Calculate average rating for each master
-        const mastersWithRating = masters.map((master) => {
-            const ratings = master.reviews.map((r) => r.rating);
+        const mastersWithRating = masters.map((master: any) => {
+            const ratings = master.reviews.map((r: any) => r.rating);
             const avgRating = ratings.length > 0
                 ? ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length
                 : 0;
@@ -41,7 +41,7 @@ export async function mastersRoutes(app: FastifyInstance) {
                 bio: master.bio,
                 photoUrl: master.photoUrl,
                 specialization: master.specialization,
-                services: master.masterServices.map((ms) => ms.service),
+                services: master.masterServices.map((ms: any) => ms.service),
                 rating: Math.round(avgRating * 10) / 10,
                 reviewCount: ratings.length,
             };
@@ -143,8 +143,8 @@ export async function mastersRoutes(app: FastifyInstance) {
         });
 
         // Calculate average rating for each master
-        const mastersWithRating = masters.map((master) => {
-            const ratings = master.reviews.map((r) => r.rating);
+        const mastersWithRating = masters.map((master: any) => {
+            const ratings = master.reviews.map((r: any) => r.rating);
             const avgRating = ratings.length > 0
                 ? ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length
                 : 0;

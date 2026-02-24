@@ -138,7 +138,7 @@ export async function masterDashboardRoutes(app: FastifyInstance) {
                 where: { masterId },
                 select: { userId: true },
                 distinct: ['userId'],
-            }).then(bookings => bookings.length),
+            }).then((bookings: any[]) => bookings.length),
             prisma.review.findMany({
                 where: { masterId, status: 'approved' },
                 select: { rating: true },
@@ -154,7 +154,7 @@ export async function masterDashboardRoutes(app: FastifyInstance) {
 
         // Calculate average rating
         const averageRating = reviews.length > 0
-            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+            ? reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length
             : 0;
 
         const stats: DashboardStats = {
@@ -254,7 +254,7 @@ export async function masterDashboardRoutes(app: FastifyInstance) {
         });
 
         // Group bookings by date
-        const bookingsByDate = bookings.reduce((acc, booking) => {
+        const bookingsByDate = bookings.reduce((acc: Record<string, typeof bookings>, booking: any) => {
             const dateKey = booking.bookingDate.toISOString().split('T')[0];
             if (!acc[dateKey]) {
                 acc[dateKey] = [];
@@ -269,7 +269,7 @@ export async function masterDashboardRoutes(app: FastifyInstance) {
 
         while (currentDate <= end) {
             const dateKey = currentDate.toISOString().split('T')[0];
-            const schedule = schedules.find(s =>
+            const schedule = schedules.find((s: any) =>
                 s.workDate.toISOString().split('T')[0] === dateKey
             );
             const dayBookings = bookingsByDate[dateKey] || [];
@@ -279,7 +279,7 @@ export async function masterDashboardRoutes(app: FastifyInstance) {
                 isDayOff: schedule?.isDayOff || false,
                 startTime: schedule?.startTime || null,
                 endTime: schedule?.endTime || null,
-                bookings: dayBookings.map(b => ({
+                bookings: dayBookings.map((b: any) => ({
                     id: b.id,
                     startTime: b.startTime,
                     endTime: b.endTime,
