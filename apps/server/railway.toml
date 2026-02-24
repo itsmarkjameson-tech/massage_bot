@@ -1,6 +1,7 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "pnpm install && pnpm prisma generate && pnpm build"
+buildCommand = "cd apps/server && pnpm install --frozen-lockfile && pnpm -r prisma generate && pnpm build"
+installCommand = "cd apps/server && pnpm install --frozen-lockfile"
 
 [deploy]
-startCommand = "node dist/server.js"
+startCommand = "cd apps/server && node dist/server.js"
