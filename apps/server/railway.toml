@@ -1,7 +1,7 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "cd apps/server && pnpm install --frozen-lockfile && pnpm -r prisma generate && pnpm build"
-installCommand = "cd apps/server && pnpm install --frozen-lockfile"
+buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @massage-bot/server prisma generate && pnpm --filter @massage-bot/server build"
+installCommand = "pnpm install --frozen-lockfile"
 
 [deploy]
-startCommand = "cd apps/server && node dist/server.js"
+startCommand = "pnpm --filter @massage-bot/server start"
