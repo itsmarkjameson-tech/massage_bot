@@ -4,4 +4,7 @@ buildCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/
 installCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/usr/local/bin && pnpm install --no-frozen-lockfile"
 
 [deploy]
-startCommand = "export PATH=$PATH:/usr/local/bin && pnpm --filter @massage-bot/server run start"
+startCommand = "cd apps/server && node dist/server.js"
+
+[variables]
+NODE_ENV = "production"
