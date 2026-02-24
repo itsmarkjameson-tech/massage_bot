@@ -258,7 +258,7 @@ export async function waitlistRoutes(app: FastifyInstance) {
             });
 
             // Проста перевірка (без генерації слотів)
-            const isSlotAvailable = !existingBookings.some((booking) => {
+            const isSlotAvailable = !existingBookings.some((booking: any) => {
                 return (
                     (startTime >= booking.startTime && startTime < booking.endTime) ||
                     (booking.startTime >= startTime && booking.startTime < booking.endTime)

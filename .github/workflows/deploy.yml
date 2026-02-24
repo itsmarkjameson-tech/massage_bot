@@ -8,6 +8,7 @@ on:
 
 env:
   NODE_VERSION: '20'
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   # Lint and Type Check
@@ -32,6 +33,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        working-directory: apps/server
+        run: pnpm prisma generate
 
       - name: Run ESLint
         run: pnpm lint || true

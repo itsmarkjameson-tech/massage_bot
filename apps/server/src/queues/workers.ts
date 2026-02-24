@@ -155,7 +155,7 @@ export async function process24HourReminders(): Promise<number> {
     let processed = 0;
 
     for (const booking of bookings) {
-        const services = booking.items.map((item) => item.service.name).join(', ');
+        const services = booking.items.map((item: any) => item.service.name).join(', ');
 
         await scheduleNotification(
             booking.user.id,
@@ -226,7 +226,7 @@ export async function process2HourReminders(): Promise<number> {
     let processed = 0;
 
     for (const booking of bookings) {
-        const services = booking.items.map((item) => item.service.name).join(', ');
+        const services = booking.items.map((item: any) => item.service.name).join(', ');
 
         await sendNotification({
             type: 'reminder_2h',

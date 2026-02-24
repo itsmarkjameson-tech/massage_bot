@@ -1,5 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import type { UserRole } from '@prisma/client';
+
+// UserRole - визначений локально оскільки Prisma клієнт може бути не згенерований
+export type UserRole = 'client' | 'master' | 'admin' | 'owner';
 
 // Extend Fastify types for JWT
 declare module '@fastify/jwt' {

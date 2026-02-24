@@ -106,9 +106,9 @@ export async function profileRoutes(app: FastifyInstance) {
 
         const stampsForReward = settings?.stampsForReward ?? 10;
         const currentStamps = stampsForReward > 0
-            ? stamps.filter((s) => !s.isReward).length % stampsForReward
-            : stamps.filter((s) => !s.isReward).length;
-        const totalRewards = stamps.filter((s) => s.isReward).length;
+            ? stamps.filter((s: any) => !s.isReward).length % stampsForReward
+            : stamps.filter((s: any) => !s.isReward).length;
+        const totalRewards = stamps.filter((s: any) => s.isReward).length;
 
         return reply.send({
             success: true,

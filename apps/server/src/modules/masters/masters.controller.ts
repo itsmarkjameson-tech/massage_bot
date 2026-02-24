@@ -32,7 +32,7 @@ export async function mastersRoutes(app: FastifyInstance) {
         const mastersWithRating = masters.map((master) => {
             const ratings = master.reviews.map((r) => r.rating);
             const avgRating = ratings.length > 0
-                ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+                ? ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length
                 : 0;
 
             return {
@@ -146,7 +146,7 @@ export async function mastersRoutes(app: FastifyInstance) {
         const mastersWithRating = masters.map((master) => {
             const ratings = master.reviews.map((r) => r.rating);
             const avgRating = ratings.length > 0
-                ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+                ? ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length
                 : 0;
 
             return {
