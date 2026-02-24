@@ -2,7 +2,9 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import sensible from '@fastify/sensible';
+import rateLimit from '@fastify/rate-limit';
 import { env } from './config/env.js';
+import { prismaPlugin } from './config/database.js';
 import { authRoutes } from './modules/auth/auth.controller.js';
 import { usersRoutes } from './modules/users/users.controller.js';
 import { servicesRoutes } from './modules/services/services.controller.js';
@@ -38,10 +40,21 @@ export async function buildApp() {
     });
 
     // Plugins
+    await app.register(rateLimit, {
+        max: 100,
+        timeWindow: '1 minute',
+        errorResponseBuilder: () => ({
+            success: false,
+            error: { message: 'Too many requests', code: 'RATE_LIMITED' },
+        }),
+    });
+
     await app.register(cors, {
         origin: env.CORS_ORIGIN,
         credentials: true,
     });
+
+    await app.register(prismaPlugin);
 
     await app.register(jwt, {
         secret: env.JWT_SECRET,

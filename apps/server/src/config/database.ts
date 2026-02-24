@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import fp from 'fastify-plugin';
 import { env } from './env.js';
 
 const globalForPrisma = globalThis as unknown as {
@@ -14,3 +15,20 @@ export const prisma =
 if (env.NODE_ENV !== 'production') {
     globalForPrisma.prisma = prisma;
 }
+
+/**
+ * Fastify plugin for Prisma client
+ * Exposes prisma as decorator on fastify instance
+ */
+async function prismaPlugin(fastify: any) {
+    fastify.decorate('prisma', prisma);
+
+    fastify.addHook('onClose', async () => {
+        await prisma.$disconnect();
+    });
+}
+
+export const prismaPlugin = fp(prismaPlugin, {
+    name: 'prismaPlugin',
+    fastify: '4.x',
+});

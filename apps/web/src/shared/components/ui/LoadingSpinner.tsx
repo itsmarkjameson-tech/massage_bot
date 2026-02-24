@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 interface LoadingSpinnerProps {
     size?: 'sm' | 'md' | 'lg';
     className?: string;
+    fullScreen?: boolean;
 }
 
 const sizeClasses = {
@@ -11,9 +12,9 @@ const sizeClasses = {
     lg: 'w-12 h-12',
 };
 
-export function LoadingSpinner({ size = 'md', className = '' }: LoadingSpinnerProps) {
+export function LoadingSpinner({ size = 'md', className = '', fullScreen = false }: LoadingSpinnerProps) {
     return (
-        <div className={`flex items-center justify-center ${className}`}>
+        <div className={`flex items-center justify-center ${fullScreen ? 'min-h-screen' : ''} ${className}`}>
             <motion.div
                 className={`${sizeClasses[size]} border-2 border-[var(--color-primary)] border-t-transparent rounded-full`}
                 animate={{ rotate: 360 }}
