@@ -1,10 +1,10 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/usr/local/bin && pnpm install --no-frozen-lockfile && pnpm --filter @massage-bot/server exec prisma generate && pnpm --filter @massage-bot/server run build"
+buildCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/usr/local/bin && pnpm install --no-frozen-lockfile && pnpm exec prisma generate && pnpm run build"
 installCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/usr/local/bin && pnpm install --no-frozen-lockfile"
 
 [deploy]
-startCommand = "node /app/apps/server/dist/server.js"
+startCommand = "node dist/server.js"
 
 [variables]
 NODE_ENV = "production"
