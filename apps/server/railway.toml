@@ -1,6 +1,6 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/usr/local/bin && pnpm install --no-frozen-lockfile --prod=false && pnpm exec prisma generate && pnpm run build"
+buildCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/usr/local/bin && pnpm install --no-frozen-lockfile --prod=false && pnpm exec prisma generate && pnpm run build && mkdir -p /app && cp -r dist /app/ && cp -r node_modules /app/ && cp package.json /app/"
 installCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/usr/local/bin && pnpm install --no-frozen-lockfile"
 
 [deploy]
@@ -8,8 +8,3 @@ startCommand = "node /app/dist/server.js"
 
 [variables]
 NODE_ENV = "production"
-DATABASE_URL = ""
-REDIS_URL = ""
-BOT_TOKEN = ""
-JWT_SECRET = ""
-WEBAPP_URL = ""
