@@ -1,6 +1,6 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/usr/local/bin && pnpm install --no-frozen-lockfile && pnpm exec prisma generate && pnpm run build"
+buildCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/usr/local/bin && pnpm install --no-frozen-lockfile --prod=false && pnpm exec prisma generate && pnpm run build && ls -la dist/"
 installCommand = "npm install -g pnpm@9 --prefix=/usr/local && export PATH=$PATH:/usr/local/bin && pnpm install --no-frozen-lockfile"
 
 [deploy]
