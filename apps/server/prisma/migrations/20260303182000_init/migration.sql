@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('client', 'master', 'admin', 'owner');
+CREATE TYPE "UserRole" AS ENUM ('client', 'master', 'admin', 'owner', 'su');
 
 -- CreateEnum
 CREATE TYPE "BookingStatus" AS ENUM ('pending_confirmation', 'confirmed', 'deposit_pending', 'deposit_paid', 'in_progress', 'completed', 'cancelled_by_client', 'cancelled_by_admin', 'no_show');
@@ -86,7 +86,7 @@ CREATE TABLE "service_durations" (
 CREATE TABLE "masters" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
-    "displayName" JSONB NOT NULL,
+    "display_name" JSONB NOT NULL,
     "bio" JSONB,
     "photo_url" TEXT,
     "specialization" TEXT,
@@ -298,20 +298,6 @@ CREATE TABLE "site_settings" (
     CONSTRAINT "site_settings_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "google_calendar_syncs" (
-    "id" TEXT NOT NULL,
-    "master_id" TEXT NOT NULL,
-    "access_token" TEXT NOT NULL,
-    "refresh_token" TEXT NOT NULL,
-    "calendar_id" TEXT,
-    "last_sync_at" TIMESTAMP(3) NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "google_calendar_syncs_pkey" PRIMARY KEY ("id")
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "users_telegram_id_key" ON "users"("telegram_id");
 
@@ -322,10 +308,16 @@ CREATE UNIQUE INDEX "masters_user_id_key" ON "masters"("user_id");
 CREATE UNIQUE INDEX "master_services_master_id_service_id_key" ON "master_services"("master_id", "service_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "master_schedules_master_id_work_date_key" ON "master_schedules"("master_id", "work_date");
+
+-- CreateIndex
 CREATE INDEX "master_schedules_master_id_work_date_idx" ON "master_schedules"("master_id", "work_date");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "master_schedules_master_id_work_date_key" ON "master_schedules"("master_id", "work_date");
+CREATE UNIQUE INDEX "bookings_booking_id_key" ON "reviews"("booking_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "loyalty_stamps_booking_id_key" ON "loyalty_stamps"("booking_id");
 
 -- CreateIndex
 CREATE INDEX "bookings_master_id_booking_date_status_idx" ON "bookings"("master_id", "booking_date", "status");
@@ -334,22 +326,13 @@ CREATE INDEX "bookings_master_id_booking_date_status_idx" ON "bookings"("master_
 CREATE INDEX "bookings_user_id_created_at_idx" ON "bookings"("user_id", "created_at");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "reviews_booking_id_key" ON "reviews"("booking_id");
+CREATE INDEX "notifications_scheduled_at_status_idx" ON "notifications"("scheduled_at", "status");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "promo_codes_code_key" ON "promo_codes"("code");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "loyalty_stamps_booking_id_key" ON "loyalty_stamps"("booking_id");
-
--- CreateIndex
-CREATE INDEX "notifications_scheduled_at_status_idx" ON "notifications"("scheduled_at", "status");
-
--- CreateIndex
 CREATE UNIQUE INDEX "site_settings_key_key" ON "site_settings"("key");
-
--- CreateIndex
-CREATE UNIQUE INDEX "google_calendar_syncs_master_id_key" ON "google_calendar_syncs"("master_id");
 
 -- AddForeignKey
 ALTER TABLE "service_categories" ADD CONSTRAINT "service_categories_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "service_categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -434,6 +417,3 @@ ALTER TABLE "waitlist" ADD CONSTRAINT "waitlist_service_id_fkey" FOREIGN KEY ("s
 
 -- AddForeignKey
 ALTER TABLE "waitlist" ADD CONSTRAINT "waitlist_master_id_fkey" FOREIGN KEY ("master_id") REFERENCES "masters"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "google_calendar_syncs" ADD CONSTRAINT "google_calendar_syncs_master_id_fkey" FOREIGN KEY ("master_id") REFERENCES "masters"("id") ON DELETE CASCADE ON UPDATE CASCADE;
