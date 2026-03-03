@@ -90,3 +90,14 @@ export const useAuthActions = () => useAuthStore((state) => ({
     logout: state.logout,
     fetchProfile: state.fetchProfile,
 }));
+
+// Role-based selectors
+export const useUserRole = () => useAuthStore((state) => state.user?.role);
+export const useIsAdmin = () => useAuthStore((state) =>
+    ['admin', 'owner', 'su'].includes(state.user?.role || '')
+);
+export const useIsOwner = () => useAuthStore((state) =>
+    ['owner', 'su'].includes(state.user?.role || '')
+);
+export const useIsSU = () => useAuthStore((state) => state.user?.role === 'su');
+export const useIsMaster = () => useAuthStore((state) => state.user?.role === 'master');

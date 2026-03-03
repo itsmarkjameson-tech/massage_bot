@@ -191,6 +191,28 @@ async function main() {
         });
     }
 
+    // Create owner user
+    await prisma.user.create({
+        data: {
+            telegramId: 999999001,
+            role: 'owner',
+            language: 'uk',
+            firstName: 'Власник',
+            telegramUsername: 'salon_owner',
+        },
+    });
+
+    // Create SU (Super User) - has all owner rights + can edit owners
+    await prisma.user.create({
+        data: {
+            telegramId: 999999999,
+            role: 'su',
+            language: 'uk',
+            firstName: 'Super User',
+            telegramUsername: 'su_admin',
+        },
+    });
+
     // Create sample promotion
     await prisma.promotion.create({
         data: {

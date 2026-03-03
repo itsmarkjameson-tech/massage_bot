@@ -17,9 +17,26 @@ export interface User {
     lastName?: string;
     phone?: string;
     avatarUrl?: string;
-    role: 'client' | 'master' | 'admin' | 'owner';
+    role: 'client' | 'master' | 'admin' | 'owner' | 'su';
     language: string;
     isActive: boolean;
+}
+
+// Role hierarchy helper - SU has owner permissions + can edit owners
+export const ROLE_HIERARCHY = {
+    su: 4,
+    owner: 3,
+    admin: 2,
+    master: 1,
+    client: 0,
+} as const;
+
+export function hasRole(userRole: User['role'], requiredRole: User['role']): boolean {
+    return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
+}
+
+export function canManageOwners(userRole: User['role']): boolean {
+    return userRole === 'su';
 }
 
 // ============ Service ============

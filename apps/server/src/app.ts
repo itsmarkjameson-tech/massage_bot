@@ -69,6 +69,13 @@ export async function buildApp() {
     // Health check
     app.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));
 
+    // Root endpoint for Railway health check
+    app.get('/', async () => ({
+        status: 'ok',
+        message: 'Massage Bot API',
+        timestamp: new Date().toISOString(),
+    }));
+
     // API Routes
     await app.register(authRoutes, { prefix: '/api/auth' });
     await app.register(usersRoutes, { prefix: '/api/users' });

@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "windows"]
 }
 
 datasource db {
@@ -16,6 +17,7 @@ enum UserRole {
   master
   admin
   owner
+  su
 }
 
 enum BookingStatus {
@@ -181,7 +183,6 @@ model Master {
   bookings          Booking[]
   reviews           Review[]
   waitlistEntries   Waitlist[]
-  calendarSync      GoogleCalendarSync?
 
   @@map("masters")
 }
@@ -433,18 +434,3 @@ model SiteSettings {
   @@map("site_settings")
 }
 
-model GoogleCalendarSync {
-  id            String   @id @default(uuid())
-  masterId      String   @unique @map("master_id")
-  accessToken   String   @map("access_token")
-  refreshToken  String   @map("refresh_token")
-  calendarId    String?  @map("calendar_id")
-  lastSyncAt    DateTime @map("last_sync_at")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  master Master @relation(fields: [masterId], references: [id], onDelete: Cascade)
-
-  @@map("google_calendar_syncs")
-}

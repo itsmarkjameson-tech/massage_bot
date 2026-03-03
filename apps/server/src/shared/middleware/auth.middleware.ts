@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 // UserRole - визначений локально оскільки Prisma клієнт може бути не згенерований
-export type UserRole = 'client' | 'master' | 'admin' | 'owner';
+export type UserRole = 'client' | 'master' | 'admin' | 'owner' | 'su';
 
 // Extend Fastify types for JWT
 declare module '@fastify/jwt' {
@@ -35,6 +35,7 @@ export async function requireAuth(request: FastifyRequest, reply: FastifyReply) 
 
 /**
  * Middleware factory: вимагає певну роль
+ * SU має доступ до всього, що і owner, плюс може редагувати owner
  */
 export function requireRole(...roles: UserRole[]) {
     return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -43,7 +44,12 @@ export function requireRole(...roles: UserRole[]) {
         if (reply.sent) return; // Already sent 401
 
         const user = request.user;
-        if (!roles.includes(user.role)) {
+        // SU має доступ до всіх ресурсів owner + може редагувати owner
+        const effectiveRoles = [...roles];
+        if (roles.includes('owner') && !effectiveRoles.includes('su')) {
+            effectiveRoles.push('su');
+        }
+        if (!effectiveRoles.includes(user.role)) {
             reply.status(403).send({
                 success: false,
                 error: { message: 'Forbidden', code: 'FORBIDDEN' },
