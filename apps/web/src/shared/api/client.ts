@@ -254,6 +254,67 @@ class ApiClient {
         if (search) params.append('search', search);
         return this.get<{ clients: MasterClient[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(`/master/clients?${params}`);
     }
+
+    // ============ Waitlist ============
+    async getWaitlist() {
+        return this.get<{
+            entries: Array<{
+                id: string;
+                serviceId: string;
+                masterId: string | null;
+                preferredDate: string;
+                preferredStart: string | null;
+                preferredEnd: string | null;
+                status: 'active' | 'notified' | 'booked' | 'expired';
+                createdAt: string;
+                service: {
+                    id: string;
+                    name: Record<string, string>;
+                    imageUrl: string | null;
+                };
+                master: {
+                    id: string;
+                    displayName: Record<string, string>;
+                    photoUrl: string | null;
+                } | null;
+            }>
+        }>('/waitlist');
+    }
+
+    async addToWaitlist(data: {
+        serviceId: string;
+        masterId?: string;
+        preferredDate: string;
+        preferredStart?: string;
+        preferredEnd?: string;
+    }) {
+        return this.post<{
+            waitlistEntry: {
+                id: string;
+                serviceId: string;
+                masterId: string | null;
+                preferredDate: string;
+                preferredStart: string | null;
+                preferredEnd: string | null;
+                status: 'active' | 'notified' | 'booked' | 'expired';
+                createdAt: string;
+                service: {
+                    id: string;
+                    name: Record<string, string>;
+                    imageUrl: string | null;
+                };
+                master: {
+                    id: string;
+                    displayName: Record<string, string>;
+                    photoUrl: string | null;
+                } | null;
+            }
+        }>('/waitlist', data);
+    }
+
+    async deleteWaitlistEntry(id: string) {
+        return this.delete(`/waitlist/${id}`);
+    }
 }
 
 export const api = new ApiClient();

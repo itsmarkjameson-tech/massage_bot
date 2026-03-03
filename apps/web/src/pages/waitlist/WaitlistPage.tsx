@@ -4,11 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../shared/api/client';
 import { useTranslatedContent } from '../../shared/hooks/useTranslatedContent';
 
-// Types
+// Types (using API types with local extensions)
 interface Service {
     id: string;
     name: Record<string, string>;
-    imageUrl: string | null;
+    imageUrl: string | null | undefined;
     durations: Array<{
         id: string;
         durationMinutes: number;
@@ -19,7 +19,7 @@ interface Service {
 interface Master {
     id: string;
     displayName: Record<string, string>;
-    photoUrl: string | null;
+    photoUrl: string | null | undefined;
 }
 
 interface WaitlistEntry {
@@ -99,13 +99,13 @@ export function WaitlistPage() {
                 setLoading(true);
 
                 const [servicesData, mastersData, waitlistData] = await Promise.all([
-                    api.get<ServicesResponse>('/services'),
-                    api.get<MastersResponse>('/masters'),
-                    api.get<WaitlistResponse>('/waitlist'),
+                    api.getServices(),
+                    api.getMasters(),
+                    api.getWaitlist(),
                 ]);
 
-                setServices(servicesData.services || []);
-                setMasters(mastersData.masters || []);
+                setServices((servicesData.services || []) as unknown as Service[]);
+                setMasters((mastersData.masters || []) as unknown as Master[]);
                 setWaitlistEntries(waitlistData.entries || []);
                 setError(null);
             } catch (err) {
@@ -127,7 +127,7 @@ export function WaitlistPage() {
         setSuccess(null);
 
         try {
-            const response = await api.post<AddWaitlistResponse>('/waitlist', {
+            const response = await api.addToWaitlist({
                 serviceId: selectedService,
                 masterId: selectedMaster || undefined,
                 preferredDate,
@@ -151,7 +151,7 @@ export function WaitlistPage() {
         if (!confirm(t('waitlist.confirmDelete'))) return;
 
         try {
-            await api.delete(`/waitlist/${id}`);
+            await api.deleteWaitlistEntry(id);
             setWaitlistEntries(waitlistEntries.filter((e) => e.id !== id));
             setSuccess(t('waitlist.removed'));
         } catch (err: any) {

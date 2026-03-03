@@ -11,7 +11,7 @@ export interface ApiResponse<T> {
 // ============ User ============
 export interface User {
     id: string;
-    telegramId: bigint;
+    telegramId: number;
     telegramUsername?: string;
     firstName?: string;
     lastName?: string;
