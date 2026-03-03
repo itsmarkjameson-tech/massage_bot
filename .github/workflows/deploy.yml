@@ -128,7 +128,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: server-prisma
-          path: apps/server/node_modules/.prisma
+          path: node_modules/.prisma
           retention-days: 1
 
   # Deploy to Vercel (Frontend)
@@ -178,7 +178,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: server-prisma
-          path: apps/server/node_modules/.prisma
+          path: node_modules/.prisma
         continue-on-error: true
 
       - name: Install Railway CLI
