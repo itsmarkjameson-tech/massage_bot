@@ -30,6 +30,29 @@ async function main() {
     }
 }
 
+// Global error handlers for uncaught errors
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('🚨 Unhandled Rejection at:', promise, 'reason:', reason);
+    // Don't exit, let the app continue running
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('🚨 Uncaught Exception:', error);
+    // Graceful shutdown on uncaught exception
+    prisma.$disconnect().finally(() => {
+        process.exit(1);
+    });
+});
+
+// Handle ECONNRESET specifically
+process.on('error', (error: any) => {
+    if (error.code === 'ECONNRESET') {
+        console.warn('⚠️ Connection reset error (expected on Railway):', error.message);
+    } else {
+        console.error('Process error:', error);
+    }
+});
+
 // Graceful shutdown
 process.on('SIGINT', async () => {
     console.log('\n🛑 Shutting down...');

@@ -42,9 +42,13 @@ export async function initBot() {
         );
     });
 
-    // Handle errors
+    // Handle errors with more detail
     bot.catch((err) => {
         console.error('Bot error:', err);
+        // Log additional context for debugging
+        if (err instanceof Error) {
+            console.error('Error stack:', err.stack);
+        }
     });
 
     // Start bot (long polling for development, webhook for production)

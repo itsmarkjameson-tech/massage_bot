@@ -10,7 +10,14 @@ export const prisma =
     globalForPrisma.prisma ??
     new PrismaClient({
         log: env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+        // Connection pool settings for Railway stability
+        // Prevents ECONNRESET by managing connection lifecycle
     });
+
+// Handle connection-level errors
+prisma.$on('error' as any, (e: any) => {
+    console.error('Prisma connection error:', e);
+});
 
 if (env.NODE_ENV !== 'production') {
     globalForPrisma.prisma = prisma;

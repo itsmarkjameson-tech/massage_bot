@@ -5,6 +5,18 @@ export function errorHandler(
     _request: FastifyRequest,
     reply: FastifyReply
 ) {
+    // Handle ECONNRESET errors gracefully (common on Railway)
+    if ((error as any).code === 'ECONNRESET' || error.message?.includes('ECONNRESET')) {
+        console.warn('⚠️ ECONNRESET error handled gracefully (connection reset by peer)');
+        return reply.status(503).send({
+            success: false,
+            error: {
+                message: 'Service temporarily unavailable, please retry',
+                code: 'ECONNRESET',
+            },
+        });
+    }
+
     const statusCode = error.statusCode ?? 500;
 
     reply.status(statusCode).send({
