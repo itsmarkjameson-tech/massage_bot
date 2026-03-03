@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import fp from 'fastify-plugin';
 import { env } from './env.js';
 
@@ -14,10 +14,8 @@ export const prisma =
         // Prevents ECONNRESET by managing connection lifecycle
     });
 
-// Handle connection-level errors
-prisma.$on('error' as Prisma.LogLevel, (e) => {
-    console.error('Prisma connection error:', e);
-});
+// Note: In Prisma v6+, error handling is done via middleware or global error handling
+// Connection errors will be caught when queries are executed
 
 if (env.NODE_ENV !== 'production') {
     globalForPrisma.prisma = prisma;
