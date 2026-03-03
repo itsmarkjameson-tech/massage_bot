@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import fp from 'fastify-plugin';
 import { env } from './env.js';
 
@@ -15,7 +15,7 @@ export const prisma =
     });
 
 // Handle connection-level errors
-prisma.$on('error' as any, (e: any) => {
+prisma.$on('error' as Prisma.LogLevel, (e) => {
     console.error('Prisma connection error:', e);
 });
 
