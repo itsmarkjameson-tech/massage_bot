@@ -58,6 +58,17 @@ pnpm install
 
 ### 5. Налаштування Vercel (Frontend)
 
+#### Обов'язкові змінні середовища
+
+У Vercel Dashboard додайте змінну:
+```
+VITE_API_URL=https://your-api.railway.app/api
+```
+
+**Важливо:** Без цієї змінної фронтенд не зможе з'єднатися з бекендом!
+
+#### Деплой через CLI
+
 ```bash
 # Встановіть Vercel CLI
 npm i -g vercel
@@ -69,13 +80,17 @@ cd apps/web
 vercel --prod
 ```
 
-Або підключіть GitHub репозиторій до Vercel:
+#### Деплой через GitHub
+
 1. Створіть проект на [vercel.com](https://vercel.com)
 2. Імпортуйте репозиторій
 3. Налаштуйте:
    - Framework Preset: Vite
    - Build Command: `pnpm build`
    - Output Directory: `dist`
+4. **Додайте Environment Variable:**
+   - Name: `VITE_API_URL`
+   - Value: `https://your-api.railway.app/api`
 
 ### 6. Налаштування Railway (Backend)
 
@@ -160,6 +175,21 @@ CI/CD вже налаштований в `.github/workflows/deploy.yml`:
 ### CORS помилки
 - Перевірте `CORS_ORIGIN` в Railway змінних
 - Має бути повний URL фронтенду
+
+### Web App: "Щось пішло не так" або білий екран
+
+**Причина 1: Не налаштований VITE_API_URL**
+- Перевірте що в Vercel налаштована змінна `VITE_API_URL`
+- Значення має бути: `https://your-api.railway.app/api`
+- Перевірте в DevTools → Network чи йдуть запити до API
+
+**Причина 2: Помилки типів (TypeScript)**
+- Перевірте консоль браузера на помилки
+- Спробуйте зібрати проєкт локально: `cd apps/web && pnpm build`
+
+**Причина 3: Неправильні CORS налаштування**
+- Перевірте що `CORS_ORIGIN` в Railway включає домен Vercel
+- Формат: `https://your-app.vercel.app`
 
 ## Корисні команди
 

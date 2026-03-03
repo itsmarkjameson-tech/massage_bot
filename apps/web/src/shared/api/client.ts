@@ -164,7 +164,37 @@ class ApiClient {
         return this.get<{ bookings: Booking[] }>('/bookings/my');
     }
 
+    // ============ Promotions ============
+    async getPromotions() {
+        return this.get<{
+            promotions: Array<{
+                id: string;
+                title: Record<string, string>;
+                description: Record<string, string> | null;
+                imageUrl: string | null;
+            }>
+        }>('/promotions');
+    }
+
     // ============ Reviews ============
+    async getReviews(limit?: number) {
+        const params = limit ? `?limit=${limit}` : '';
+        return this.get<{
+            reviews: Array<{
+                id: string;
+                rating: number;
+                comment: string;
+                user: {
+                    firstName: string | null;
+                    avatarUrl: string | null;
+                };
+                master: {
+                    displayName: Record<string, string>;
+                };
+            }>
+        }>(`/reviews${params}`);
+    }
+
     async getMasterReviews(masterId: string) {
         return this.get<{ reviews: Review[] }>(`/reviews/master/${masterId}`);
     }

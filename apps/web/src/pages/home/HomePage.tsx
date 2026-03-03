@@ -4,23 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { api } from '../../shared/api/client';
 import { useTranslatedContent } from '../../shared/hooks/useTranslatedContent';
+import type { Service, Master } from '../../shared/api/types';
 
-// Types
-interface Service {
-    id: string;
-    name: Record<string, string>;
-    imageUrl: string | null;
-    durations: Array<{ price: number }>;
-}
-
-interface Master {
-    id: string;
-    displayName: string;
-    photoUrl: string | null;
-    rating: number;
-    reviewCount: number;
-}
-
+// Local types for API responses
 interface Promotion {
     id: string;
     title: Record<string, string>;
@@ -37,24 +23,8 @@ interface Review {
         avatarUrl: string | null;
     };
     master: {
-        displayName: string;
+        displayName: Record<string, string>;
     };
-}
-
-interface ServicesResponse {
-    services: Service[];
-}
-
-interface MastersResponse {
-    masters: Master[];
-}
-
-interface PromotionsResponse {
-    promotions: Promotion[];
-}
-
-interface ReviewsResponse {
-    reviews: Review[];
 }
 
 // Google Maps configuration
@@ -84,19 +54,19 @@ export function HomePage() {
                 setLoading(true);
 
                 // Fetch services
-                const servicesData = await api.get<ServicesResponse>('/services');
+                const servicesData = await api.getServices();
                 setServices(servicesData.services || []);
 
                 // Fetch masters
-                const mastersData = await api.get<MastersResponse>('/masters');
+                const mastersData = await api.getMasters();
                 setMasters(mastersData.masters || []);
 
                 // Fetch promotions
-                const promotionsData = await api.get<PromotionsResponse>('/promotions');
+                const promotionsData = await api.getPromotions();
                 setPromotions(promotionsData.promotions || []);
 
                 // Fetch reviews
-                const reviewsData = await api.get<ReviewsResponse>('/reviews?limit=6');
+                const reviewsData = await api.getReviews(6);
                 setReviews(reviewsData.reviews || []);
 
                 setError(null);
@@ -114,7 +84,7 @@ export function HomePage() {
     // Get minimum price from service durations
     const getMinPrice = (service: Service): number | null => {
         if (!service.durations || service.durations.length === 0) return null;
-        const prices = service.durations.map((d) => d.price).filter((p) => p > 0);
+        const prices = service.durations.map((d) => d.basePrice).filter((p) => p > 0);
         return prices.length > 0 ? Math.min(...prices) : null;
     };
 
@@ -245,14 +215,14 @@ export function HomePage() {
                                     {master.photoUrl ? (
                                         <img
                                             src={master.photoUrl}
-                                            alt={master.displayName}
+                                            alt={tContent(master.displayName)}
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
                                         '👩‍⚕️'
                                     )}
                                 </div>
-                                <h3 className="font-semibold text-sm">{master.displayName}</h3>
+                                <h3 className="font-semibold text-sm">{tContent(master.displayName)}</h3>
                                 <p className="text-xs text-[var(--color-hint)]">
                                     ⭐ {master.rating.toFixed(1)} ({master.reviewCount} {t('home.masters.reviews')})
                                 </p>
