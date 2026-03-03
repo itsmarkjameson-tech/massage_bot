@@ -16,6 +16,10 @@ export async function setWebhook(url: string) {
 }
 
 export async function initBot() {
+    // Initialize bot (required for webhook mode)
+    await bot.init();
+    console.log(`✅ Bot initialized: @${bot.botInfo.username}`);
+
     // /start command
     bot.command('start', async (ctx) => {
         const firstName = ctx.from?.first_name ?? 'друже';
