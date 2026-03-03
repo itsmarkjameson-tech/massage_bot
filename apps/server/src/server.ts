@@ -13,8 +13,8 @@ async function main() {
         const app = await buildApp();
 
         // Initialize Telegram Bot
+        await initBot();
         if (env.NODE_ENV === 'development') {
-            await initBot();
             console.log('✅ Telegram Bot started (long polling)');
         } else if (env.BOT_WEBHOOK_URL) {
             await setWebhook(env.BOT_WEBHOOK_URL + '/webhook');
