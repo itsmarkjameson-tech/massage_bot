@@ -30,5 +30,5 @@ async function prismaPluginFn(fastify: any) {
 
 export const prismaPlugin = fp(prismaPluginFn, {
     name: 'prismaPlugin',
-    fastify: '4.x',
+    fastify: '5.x',
 });
