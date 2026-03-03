@@ -87,12 +87,12 @@ export async function buildApp() {
     // Admin routes
     await app.register(adminServicesRoutes, { prefix: '/api/admin' });
     await app.register(adminCombosRoutes, { prefix: '/api/admin/combos' });
-    await app.register(adminMastersRoutes, { prefix: '/api/admin' });
-    await app.register(adminBookingsRoutes, { prefix: '/api/admin' });
-    await app.register(adminUsersRoutes, { prefix: '/api/admin' });
-    await app.register(adminPromoCodesRoutes, { prefix: '/api/admin' });
+    await app.register(adminMastersRoutes, { prefix: '/api/admin/masters' });
+    await app.register(adminBookingsRoutes, { prefix: '/api/admin/bookings' });
+    await app.register(adminUsersRoutes, { prefix: '/api/admin/users' });
+    await app.register(adminPromoCodesRoutes, { prefix: '/api/admin/promo-codes' });
     await app.register(adminLoyaltyRoutes, { prefix: '/api/admin/loyalty' });
-    await app.register(adminReviewsRoutes, { prefix: '/api/admin' });
+    await app.register(adminReviewsRoutes, { prefix: '/api/admin/reviews' });
     await app.register(adminAnalyticsRoutes, { prefix: '/api/admin/analytics' });
 
     // Waitlist routes
