@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../shared/api/client';
+import { GlassCard, GlassCardStatic } from '../../shared/components/ui/GlassCard';
+import { GradientButton } from '../../shared/components/ui/GradientButton';
 import type { Service, Master, ServiceDuration, MasterService } from '../../shared/api/types';
 
 // Types for booking wizard
@@ -12,6 +14,30 @@ interface SelectedService {
 }
 
 type WizardStep = 'service' | 'master' | 'datetime' | 'confirm';
+
+// Animation variants
+const stepVariants = {
+    initial: { opacity: 0, x: 30 },
+    animate: {
+        opacity: 1,
+        x: 0,
+        transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] as const }
+    },
+    exit: { opacity: 0, x: -30 }
+};
+
+const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+        opacity: 1,
+        y: 0,
+        transition: {
+            delay: i * 0.05,
+            duration: 0.4,
+            ease: [0.4, 0, 0.2, 1] as const,
+        },
+    }),
+};
 
 export function BookingPage() {
     const { t, i18n } = useTranslation();
@@ -318,85 +344,114 @@ export function BookingPage() {
     // Success page
     if (bookingSuccess && createdBooking) {
         return (
-            <div className="px-4 py-6 animate-fade-in">
+            <div className="min-h-screen bg-aurora px-4 py-6 animate-fade-in">
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="text-center py-12"
+                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                    className="text-center py-12 max-w-md mx-auto"
                 >
-                    <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow">
                         <span className="text-5xl">✓</span>
                     </div>
-                    <h1 className="text-2xl font-bold mb-2">{t('booking.success')}</h1>
-                    <p className="text-[var(--color-hint)] mb-8">{t('booking.successMessage')}</p>
+                    <h1 className="text-2xl font-bold mb-2 gradient-text">{t('booking.success')}</h1>
+                    <p className="text-white/60 mb-8">{t('booking.successMessage')}</p>
 
-                    <div className="bg-[var(--color-secondary-bg)] rounded-2xl p-4 text-left mb-6">
-                        <h3 className="font-semibold mb-3">{t('booking.bookingDetails')}</h3>
-                        <div className="space-y-2 text-sm">
+                    <GlassCardStatic variant="elevated" className="p-6 text-left mb-6">
+                        <h3 className="font-semibold mb-4 text-white/90">{t('booking.bookingDetails')}</h3>
+                        <div className="space-y-3 text-sm">
                             <div className="flex justify-between">
-                                <span className="text-[var(--color-hint)]">{t('booking.date')}:</span>
-                                <span>{new Date(createdBooking.bookingDate).toLocaleDateString('uk-UA')}</span>
+                                <span className="text-white/50">{t('booking.date')}:</span>
+                                <span className="text-white/90">{new Date(createdBooking.bookingDate).toLocaleDateString('uk-UA')}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-[var(--color-hint)]">{t('booking.time')}:</span>
-                                <span>{createdBooking.startTime} - {createdBooking.endTime}</span>
+                                <span className="text-white/50">{t('booking.time')}:</span>
+                                <span className="text-white/90">{createdBooking.startTime} - {createdBooking.endTime}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-[var(--color-hint)]">{t('booking.master')}:</span>
-                                <span>{getMasterName(createdBooking.master)}</span>
+                                <span className="text-white/50">{t('booking.master')}:</span>
+                                <span className="text-white/90">{getMasterName(createdBooking.master)}</span>
                             </div>
-                            <div className="flex justify-between font-bold pt-2 border-t border-[var(--color-border)]">
-                                <span>{t('booking.total')}:</span>
-                                <span>{Number(createdBooking.totalPrice)} ₴</span>
+                            <div className="flex justify-between font-bold pt-3 border-t border-white/10">
+                                <span className="text-white/90">{t('booking.total')}:</span>
+                                <span className="text-violet-300">{Number(createdBooking.totalPrice)} ₴</span>
                             </div>
                         </div>
-                    </div>
+                    </GlassCardStatic>
 
-                    <button
+                    <GradientButton
+                        size="lg"
                         onClick={() => navigate('/')}
-                        className="w-full py-4 bg-[var(--color-btn)] text-[var(--color-btn-text)] rounded-xl font-semibold"
+                        className="w-full"
                     >
                         {t('booking.goHome')}
-                    </button>
+                    </GradientButton>
                 </motion.div>
             </div>
         );
     }
 
     return (
-        <div className="px-4 py-6 animate-fade-in">
-            <h1 className="text-2xl font-bold mb-6">{t('booking.title')}</h1>
+        <div className="min-h-screen bg-aurora px-4 py-6 animate-fade-in pb-24">
+            {/* Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-8"
+            >
+                <h1 className="text-2xl font-bold gradient-text">{t('booking.title')}</h1>
+                <p className="text-white/50 text-sm mt-1">{t('booking.subtitle')}</p>
+            </motion.div>
 
             {/* Steps Indicator */}
-            <div className="flex items-center justify-between mb-8">
-                {(['service', 'master', 'datetime', 'confirm'] as WizardStep[]).map((s, index) => (
-                    <div key={s} className="flex items-center flex-1">
-                        <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${step === s
-                                ? 'bg-[var(--color-btn)] text-[var(--color-btn-text)]'
-                                : index < ['service', 'master', 'datetime', 'confirm'].indexOf(step)
-                                    ? 'bg-green-500 text-white'
-                                    : 'bg-[var(--color-secondary-bg)] text-[var(--color-hint)]'
-                                }`}
-                        >
-                            {index < ['service', 'master', 'datetime', 'confirm'].indexOf(step) ? '✓' : index + 1}
-                        </div>
-                        {index < 3 && (
-                            <div className={`flex-1 h-0.5 mx-2 ${index < ['service', 'master', 'datetime', 'confirm'].indexOf(step)
-                                ? 'bg-green-500'
-                                : 'bg-[var(--color-secondary-bg)]'
-                                }`} />
-                        )}
-                    </div>
-                ))}
+            <div className="mb-8">
+                <div className="flex items-center justify-between">
+                    {(['service', 'master', 'datetime', 'confirm'] as WizardStep[]).map((s, index) => {
+                        const isActive = step === s;
+                        const isCompleted = index < ['service', 'master', 'datetime', 'confirm'].indexOf(step);
+                        return (
+                            <div key={s} className="flex items-center flex-1">
+                                <motion.div
+                                    initial={false}
+                                    animate={{
+                                        backgroundColor: isActive || isCompleted ? 'rgba(139, 92, 246, 1)' : 'rgba(255, 255, 255, 0.1)',
+                                        scale: isActive ? 1.1 : 1,
+                                    }}
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${isActive ? 'text-white shadow-glow' :
+                                        isCompleted ? 'text-white' : 'text-white/50'
+                                        }`}
+                                >
+                                    {isCompleted ? '✓' : index + 1}
+                                </motion.div>
+                                {index < 3 && (
+                                    <div className={`flex-1 h-0.5 mx-2 transition-colors duration-300 ${isCompleted ? 'bg-violet-500' : 'bg-white/10'
+                                        }`} />
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="flex justify-between mt-2 text-xs text-white/50">
+                    <span>{t('booking.steps.service')}</span>
+                    <span>{t('booking.steps.master')}</span>
+                    <span>{t('booking.steps.datetime')}</span>
+                    <span>{t('booking.steps.confirm')}</span>
+                </div>
             </div>
 
             {/* Error Message */}
-            {error && (
-                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-xl text-sm">
-                    {error}
-                </div>
-            )}
+            <AnimatePresence>
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mb-4 p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-300 text-sm"
+                    >
+                        {error}
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Step Content */}
             <AnimatePresence mode="wait">
@@ -404,70 +459,88 @@ export function BookingPage() {
                 {step === 'service' && (
                     <motion.div
                         key="service"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
+                        variants={stepVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
                         className="space-y-4"
                     >
-                        <h2 className="text-lg font-semibold">{t('booking.selectService')}</h2>
+                        <h2 className="text-lg font-semibold text-white/90">{t('booking.selectService')}</h2>
 
                         {loading ? (
-                            <div className="text-center py-8 text-[var(--color-hint)]">
+                            <div className="text-center py-12 text-white/50">
+                                <div className="w-8 h-8 border-2 border-violet-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                                 {t('common.loading')}
                             </div>
                         ) : (
-                            <div className="space-y-3">
-                                {services.map((service) => (
-                                    <div key={service.id}>
-                                        <div className="flex items-center gap-3 p-3">
-                                            <div className="w-12 h-12 bg-[var(--color-primary)]/20 rounded-xl flex items-center justify-center text-2xl">
-                                                💆
+                            <div className="space-y-4">
+                                {services.map((service, index) => (
+                                    <motion.div
+                                        key={service.id}
+                                        custom={index}
+                                        variants={cardVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                    >
+                                        <GlassCardStatic variant="elevated" className="p-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-14 h-14 bg-gradient-to-br from-violet-500/30 to-pink-500/30 rounded-xl flex items-center justify-center text-2xl border border-white/10">
+                                                    💆
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="font-semibold text-white/90">{getServiceName(service)}</h3>
+                                                </div>
                                             </div>
-                                            <div className="flex-1">
-                                                <h3 className="font-semibold">{getServiceName(service)}</h3>
+                                            {/* Durations */}
+                                            <div className="flex gap-2 flex-wrap mt-4 pl-[72px]">
+                                                {service.durations.map((duration) => {
+                                                    const isSelected = selectedServices.some(
+                                                        s => s.service.id === service.id && s.duration.id === duration.id
+                                                    );
+                                                    return (
+                                                        <button
+                                                            key={duration.id}
+                                                            onClick={() => handleServiceToggle(service, duration)}
+                                                            className={`px-4 py-2 rounded-lg text-sm transition-all duration-200 ${isSelected
+                                                                ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-glow'
+                                                                : 'bg-white/5 text-white/60 hover:bg-white/10'
+                                                                }`}
+                                                        >
+                                                            {duration.durationMinutes} {t('booking.minutes')} • {duration.basePrice} ₴
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
-                                        </div>
-                                        {/* Durations */}
-                                        <div className="ml-15 pl-15 flex gap-2 flex-wrap mt-2">
-                                            {service.durations.map((duration) => {
-                                                const isSelected = selectedServices.some(
-                                                    s => s.service.id === service.id && s.duration.id === duration.id
-                                                );
-                                                return (
-                                                    <button
-                                                        key={duration.id}
-                                                        onClick={() => handleServiceToggle(service, duration)}
-                                                        className={`px-3 py-2 rounded-lg text-sm transition-colors ${isSelected
-                                                            ? 'bg-[var(--color-btn)] text-[var(--color-btn-text)]'
-                                                            : 'bg-[var(--color-secondary-bg)] text-[var(--color-hint)]'
-                                                            }`}
-                                                    >
-                                                        {duration.durationMinutes} {t('booking.minutes')} • {duration.basePrice} ₴
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
+                                        </GlassCardStatic>
+                                    </motion.div>
                                 ))}
                             </div>
                         )}
 
                         {/* Selected Summary */}
-                        {selectedServices.length > 0 && (
-                            <div className="mt-6 p-4 bg-[var(--color-secondary-bg)] rounded-2xl">
-                                <h3 className="font-semibold mb-2">{t('booking.selectedServices')}</h3>
-                                {selectedServices.map((s, i) => (
-                                    <div key={i} className="flex justify-between text-sm py-1">
-                                        <span>{getServiceName(s.service)} ({s.duration.durationMinutes} {t('booking.minutes')})</span>
-                                        <span>{s.duration.basePrice} ₴</span>
-                                    </div>
-                                ))}
-                                <div className="flex justify-between font-bold pt-2 mt-2 border-t border-[var(--color-border)]">
-                                    <span>{t('booking.total')}</span>
-                                    <span>{totalPrice} ₴</span>
-                                </div>
-                            </div>
-                        )}
+                        <AnimatePresence>
+                            {selectedServices.length > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                >
+                                    <GlassCardStatic variant="gradient" className="p-5 mt-6">
+                                        <h3 className="font-semibold mb-3 text-white/90">{t('booking.selectedServices')}</h3>
+                                        {selectedServices.map((s, i) => (
+                                            <div key={i} className="flex justify-between text-sm py-2 text-white/70">
+                                                <span>{getServiceName(s.service)} ({s.duration.durationMinutes} {t('booking.minutes')})</span>
+                                                <span>{s.duration.basePrice} ₴</span>
+                                            </div>
+                                        ))}
+                                        <div className="flex justify-between font-bold pt-3 mt-2 border-t border-white/10 text-white/90">
+                                            <span>{t('booking.total')}</span>
+                                            <span className="text-violet-300">{totalPrice} ₴</span>
+                                        </div>
+                                    </GlassCardStatic>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </motion.div>
                 )}
 
@@ -475,49 +548,59 @@ export function BookingPage() {
                 {step === 'master' && (
                     <motion.div
                         key="master"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
+                        variants={stepVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
                         className="space-y-4"
                     >
-                        <h2 className="text-lg font-semibold">{t('booking.selectMaster')}</h2>
+                        <h2 className="text-lg font-semibold text-white/90">{t('booking.selectMaster')}</h2>
 
                         {availableMasters.length === 0 ? (
-                            <div className="text-center py-8 text-[var(--color-hint)]">
+                            <div className="text-center py-12 text-white/50">
+                                <div className="text-4xl mb-4">👤</div>
                                 {t('booking.noMastersAvailable')}
                             </div>
                         ) : (
-                            <div className="space-y-3">
-                                {availableMasters.map((master) => (
-                                    <div
+                            <div className="space-y-4">
+                                {availableMasters.map((master, index) => (
+                                    <motion.div
                                         key={master.id}
-                                        onClick={() => handleMasterSelect(master)}
-                                        className={`p-4 rounded-2xl flex items-center gap-4 cursor-pointer transition-all ${selectedMaster?.id === master.id
-                                            ? 'bg-[var(--color-btn)]/10 ring-2 ring-[var(--color-btn)]'
-                                            : 'bg-[var(--color-secondary-bg)]'
-                                            }`}
+                                        custom={index}
+                                        variants={cardVariants}
+                                        initial="hidden"
+                                        animate="visible"
                                     >
-                                        <div className="w-14 h-14 rounded-full bg-[var(--color-primary)]/20 flex items-center justify-center text-2xl overflow-hidden">
-                                            {master.photoUrl ? (
-                                                <img src={master.photoUrl} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                '👤'
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="font-semibold">{getMasterName(master)}</h3>
-                                            {master.rating > 0 && (
-                                                <div className="flex items-center gap-1 text-sm text-[var(--color-hint)]">
-                                                    <span>⭐</span>
-                                                    <span>{master.rating.toFixed(1)}</span>
-                                                    <span>({master.reviewCount} {t('booking.reviews')})</span>
+                                        <GlassCardStatic
+                                            variant={selectedMaster?.id === master.id ? 'gradient' : 'elevated'}
+                                            className={`p-4 cursor-pointer transition-all duration-200 ${selectedMaster?.id === master.id ? 'ring-2 ring-violet-400' : ''
+                                                }`}
+                                            onClick={() => handleMasterSelect(master)}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500/30 to-pink-500/30 flex items-center justify-center text-2xl overflow-hidden border-2 border-white/10">
+                                                    {master.photoUrl ? (
+                                                        <img src={master.photoUrl} alt="" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        '👤'
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
-                                        {selectedMaster?.id === master.id && (
-                                            <span className="text-[var(--color-btn)]">✓</span>
-                                        )}
-                                    </div>
+                                                <div className="flex-1">
+                                                    <h3 className="font-semibold text-white/90">{getMasterName(master)}</h3>
+                                                    {master.rating > 0 && (
+                                                        <div className="flex items-center gap-1 text-sm text-violet-300 mt-1">
+                                                            <span>★</span>
+                                                            <span>{master.rating.toFixed(1)}</span>
+                                                            <span className="text-white/40">({master.reviewCount} {t('booking.reviews')})</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {selectedMaster?.id === master.id && (
+                                                    <span className="text-violet-400 text-2xl">✓</span>
+                                                )}
+                                            </div>
+                                        </GlassCardStatic>
+                                    </motion.div>
                                 ))}
                             </div>
                         )}
@@ -528,60 +611,69 @@ export function BookingPage() {
                 {step === 'datetime' && (
                     <motion.div
                         key="datetime"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        className="space-y-4"
+                        variants={stepVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        className="space-y-6"
                     >
-                        <h2 className="text-lg font-semibold">{t('booking.selectDate')}</h2>
-
-                        {/* Date Selection */}
-                        <div className="flex gap-2 overflow-x-auto pb-2">
-                            {generateDates().map((date) => (
-                                <button
-                                    key={date}
-                                    onClick={() => handleDateSelect(date)}
-                                    className={`px-4 py-3 rounded-xl text-sm whitespace-nowrap transition-colors ${selectedDate === date
-                                        ? 'bg-[var(--color-btn)] text-[var(--color-btn-text)]'
-                                        : 'bg-[var(--color-secondary-bg)]'
-                                        }`}
-                                >
-                                    {formatDate(date)}
-                                </button>
-                            ))}
+                        <div>
+                            <h2 className="text-lg font-semibold text-white/90 mb-4">{t('booking.selectDate')}</h2>
+                            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                                {generateDates().map((date) => (
+                                    <button
+                                        key={date}
+                                        onClick={() => handleDateSelect(date)}
+                                        className={`px-4 py-3 rounded-xl text-sm whitespace-nowrap transition-all duration-200 ${selectedDate === date
+                                            ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-glow'
+                                            : 'glass-card text-white/70 hover:bg-white/10'
+                                            }`}
+                                    >
+                                        {formatDate(date)}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Time Selection */}
-                        {selectedDate && (
-                            <>
-                                <h2 className="text-lg font-semibold mt-6">{t('booking.selectTime')}</h2>
+                        <AnimatePresence>
+                            {selectedDate && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                >
+                                    <h2 className="text-lg font-semibold text-white/90 mb-4">{t('booking.selectTime')}</h2>
 
-                                {loadingSlots ? (
-                                    <div className="text-center py-8 text-[var(--color-hint)]">
-                                        {t('booking.loadingSlots')}
-                                    </div>
-                                ) : timeSlots.length === 0 ? (
-                                    <div className="text-center py-8 text-[var(--color-hint)]">
-                                        {t('booking.noSlots')}
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {timeSlots.map((time) => (
-                                            <button
-                                                key={time}
-                                                onClick={() => handleTimeSelect(time)}
-                                                className={`py-3 rounded-xl text-sm transition-colors ${selectedTime === time
-                                                    ? 'bg-[var(--color-btn)] text-[var(--color-btn-text)]'
-                                                    : 'bg-[var(--color-secondary-bg)]'
-                                                    }`}
-                                            >
-                                                {formatTime(time)}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </>
-                        )}
+                                    {loadingSlots ? (
+                                        <div className="text-center py-12 text-white/50">
+                                            <div className="w-8 h-8 border-2 border-violet-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                                            {t('booking.loadingSlots')}
+                                        </div>
+                                    ) : timeSlots.length === 0 ? (
+                                        <div className="text-center py-12 text-white/50">
+                                            <div className="text-4xl mb-4">🕐</div>
+                                            {t('booking.noSlots')}
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                            {timeSlots.map((time) => (
+                                                <button
+                                                    key={time}
+                                                    onClick={() => handleTimeSelect(time)}
+                                                    className={`py-3 rounded-xl text-sm transition-all duration-200 ${selectedTime === time
+                                                        ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-glow'
+                                                        : 'glass-card text-white/70 hover:bg-white/10'
+                                                        }`}
+                                                >
+                                                    {formatTime(time)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </motion.div>
                 )}
 
@@ -589,46 +681,47 @@ export function BookingPage() {
                 {step === 'confirm' && (
                     <motion.div
                         key="confirm"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
+                        variants={stepVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
                         className="space-y-4"
                     >
-                        <h2 className="text-lg font-semibold">{t('booking.summary')}</h2>
+                        <h2 className="text-lg font-semibold text-white/90">{t('booking.summary')}</h2>
 
-                        <div className="bg-[var(--color-secondary-bg)] rounded-2xl p-4 space-y-4">
+                        <GlassCardStatic variant="gradient" className="p-5 space-y-5">
                             {/* Services */}
                             <div>
-                                <h3 className="text-sm text-[var(--color-hint)] mb-2">{t('booking.services')}</h3>
+                                <h3 className="text-sm text-white/50 mb-3">{t('booking.services')}</h3>
                                 {selectedServices.map((s, i) => (
-                                    <div key={i} className="flex justify-between py-1">
-                                        <span>{getServiceName(s.service)} ({s.duration.durationMinutes} {t('booking.minutes')})</span>
-                                        <span>{s.duration.basePrice} ₴</span>
+                                    <div key={i} className="flex justify-between py-2 text-sm">
+                                        <span className="text-white/80">{getServiceName(s.service)} ({s.duration.durationMinutes} {t('booking.minutes')})</span>
+                                        <span className="text-white/80">{s.duration.basePrice} ₴</span>
                                     </div>
                                 ))}
                             </div>
 
                             {/* Master */}
-                            <div className="flex justify-between py-1">
-                                <span className="text-[var(--color-hint)]">{t('booking.master')}:</span>
-                                <span>{selectedMaster ? getMasterName(selectedMaster) : '-'}</span>
+                            <div className="flex justify-between py-2 border-t border-white/10">
+                                <span className="text-white/50">{t('booking.master')}:</span>
+                                <span className="text-white/80">{selectedMaster ? getMasterName(selectedMaster) : '-'}</span>
                             </div>
 
                             {/* Date & Time */}
-                            <div className="flex justify-between py-1">
-                                <span className="text-[var(--color-hint)]">{t('booking.date')} {t('booking.time')}:</span>
-                                <span>{selectedDate ? formatDate(selectedDate) : '-'} {selectedTime}</span>
+                            <div className="flex justify-between py-2">
+                                <span className="text-white/50">{t('booking.date')} & {t('booking.time')}:</span>
+                                <span className="text-white/80">{selectedDate ? formatDate(selectedDate) : '-'} {selectedTime}</span>
                             </div>
 
                             {/* Duration */}
-                            <div className="flex justify-between py-1">
-                                <span className="text-[var(--color-hint)]">{t('booking.durationTotal')}:</span>
-                                <span>{totalDuration} {t('booking.minutes')}</span>
+                            <div className="flex justify-between py-2">
+                                <span className="text-white/50">{t('booking.durationTotal')}:</span>
+                                <span className="text-white/80">{totalDuration} {t('booking.minutes')}</span>
                             </div>
 
                             {/* Promo Code */}
-                            <div className="pt-4 border-t border-[var(--color-border)]">
-                                <h3 className="text-sm text-[var(--color-hint)] mb-2">{t('booking.promoCode')}</h3>
+                            <div className="pt-4 border-t border-white/10">
+                                <h3 className="text-sm text-white/50 mb-3">{t('booking.promoCode')}</h3>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
@@ -636,67 +729,73 @@ export function BookingPage() {
                                         onChange={(e) => setPromoCode(e.target.value)}
                                         placeholder={t('booking.enterPromoCode')}
                                         disabled={promoApplied}
-                                        className="flex-1 px-4 py-2 rounded-xl bg-white border border-[var(--color-border)] text-sm"
+                                        className="flex-1 px-4 py-3 rounded-xl glass-input text-sm text-white/90 placeholder:text-white/30"
                                     />
                                     {!promoApplied ? (
-                                        <button
+                                        <GradientButton
+                                            variant="secondary"
+                                            size="sm"
                                             onClick={handlePromoApply}
                                             disabled={!promoCode.trim()}
-                                            className="px-4 py-2 bg-[var(--color-btn)] text-[var(--color-btn-text)] rounded-xl text-sm font-medium disabled:opacity-50"
                                         >
                                             {t('booking.apply')}
-                                        </button>
+                                        </GradientButton>
                                     ) : (
-                                        <span className="px-4 py-2 text-green-600 text-sm">✓ {t('booking.promoApplied')}</span>
+                                        <span className="px-4 py-3 text-green-400 text-sm flex items-center">
+                                            ✓ {t('booking.promoApplied')}
+                                        </span>
                                     )}
                                 </div>
                                 {promoError && (
-                                    <p className="text-red-500 text-sm mt-2">{promoError}</p>
+                                    <p className="text-red-400 text-sm mt-2">{promoError}</p>
                                 )}
                             </div>
 
                             {/* Totals */}
-                            <div className="pt-4 border-t border-[var(--color-border)]">
-                                <div className="flex justify-between py-1">
-                                    <span className="text-[var(--color-hint)]">{t('booking.subtotal')}:</span>
-                                    <span>{totalPrice} ₴</span>
+                            <div className="pt-4 border-t border-white/10 space-y-2">
+                                <div className="flex justify-between py-1 text-sm">
+                                    <span className="text-white/50">{t('booking.subtotal')}:</span>
+                                    <span className="text-white/80">{totalPrice} ₴</span>
                                 </div>
                                 {promoDiscount > 0 && (
-                                    <div className="flex justify-between py-1 text-green-600">
+                                    <div className="flex justify-between py-1 text-green-400 text-sm">
                                         <span>{t('booking.discount')}:</span>
                                         <span>-{promoDiscount} ₴</span>
                                     </div>
                                 )}
-                                <div className="flex justify-between py-2 font-bold text-lg">
-                                    <span>{t('booking.total')}:</span>
-                                    <span>{finalPrice} ₴</span>
+                                <div className="flex justify-between py-2 font-bold text-lg border-t border-white/10 pt-3">
+                                    <span className="text-white/90">{t('booking.total')}:</span>
+                                    <span className="text-violet-300">{finalPrice} ₴</span>
                                 </div>
                             </div>
-                        </div>
+                        </GlassCardStatic>
                     </motion.div>
                 )}
             </AnimatePresence>
 
             {/* Navigation Buttons */}
-            <div className="flex gap-3 mt-8">
-                {step !== 'service' && (
-                    <button
-                        onClick={prevStep}
-                        className="flex-1 py-4 bg-[var(--color-secondary-bg)] rounded-xl font-semibold"
+            <div className="fixed bottom-20 left-0 right-0 px-4 py-4 bg-gradient-to-t from-[#0f172a] via-[#0f172a] to-transparent z-20">
+                <div className="flex gap-3 max-w-lg mx-auto">
+                    {step !== 'service' && (
+                        <GradientButton
+                            variant="ghost"
+                            size="md"
+                            onClick={prevStep}
+                            className="flex-1"
+                        >
+                            {t('common.back')}
+                        </GradientButton>
+                    )}
+                    <GradientButton
+                        size="md"
+                        onClick={step === 'confirm' ? handleBooking : nextStep}
+                        disabled={!canProceed() || loading}
+                        className="flex-1"
+                        loading={loading}
                     >
-                        {t('common.back')}
-                    </button>
-                )}
-                <button
-                    onClick={step === 'confirm' ? handleBooking : nextStep}
-                    disabled={!canProceed() || loading}
-                    className={`flex-1 py-4 rounded-xl font-semibold transition-colors ${canProceed()
-                        ? 'bg-[var(--color-btn)] text-[var(--color-btn-text)]'
-                        : 'bg-[var(--color-secondary-bg)] text-[var(--color-hint)]'
-                        }`}
-                >
-                    {loading ? t('common.loading') : step === 'confirm' ? t('booking.bookNow') : t('common.next')}
-                </button>
+                        {step === 'confirm' ? t('booking.bookNow') : t('common.next')}
+                    </GradientButton>
+                </div>
             </div>
         </div>
     );

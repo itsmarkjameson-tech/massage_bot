@@ -48,6 +48,8 @@ export const useAuthStore = create<AuthState>()(
                 set({ isLoading: true });
                 try {
                     const { user } = await api.getProfile();
+                    console.log('[AuthStore] Profile fetched:', user);
+                    console.log('[AuthStore] User role:', user?.role);
                     set({ user, isLoading: false });
                 } catch (error) {
                     console.error('Failed to fetch profile:', error);

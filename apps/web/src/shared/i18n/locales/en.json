@@ -10,13 +10,16 @@
         "confirm": "Confirm",
         "close": "Close",
         "search": "Search",
-        "noResults": "No results found"
+        "noResults": "No results found",
+        "from": "from",
+        "optional": "(optional)"
     },
     "nav": {
         "home": "Home",
         "booking": "Booking",
         "waitlist": "Waitlist",
-        "profile": "Profile"
+        "profile": "Profile",
+        "admin": "Admin"
     },
     "home": {
         "hero": {
@@ -33,11 +36,17 @@
         },
         "services": {
             "title": "Our Services",
+            "subtitle": "Choose a service for your relaxation",
             "from": "from"
         },
         "masters": {
             "title": "Our Masters",
+            "subtitle": "Professionals with years of experience",
             "reviews": "reviews"
+        },
+        "cta": {
+            "title": "Ready to relax?",
+            "subtitle": "Book now and get 10% off your first visit"
         },
         "reviews": {
             "title": "Client Reviews"
@@ -48,6 +57,7 @@
     },
     "booking": {
         "title": "Book an Appointment",
+        "subtitle": "Book your visit in a few steps",
         "steps": {
             "service": "Service",
             "master": "Master",
@@ -56,6 +66,8 @@
         },
         "selectService": "Select a service",
         "selectDuration": "Select duration",
+        "duration": "Duration",
+        "minutes": "min",
         "selectMaster": "Select a master",
         "anyMaster": "Any available master",
         "selectDate": "Select a date",
