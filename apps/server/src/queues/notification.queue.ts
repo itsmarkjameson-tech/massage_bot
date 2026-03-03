@@ -1,5 +1,5 @@
 import { Queue, QueueEvents, ConnectionOptions } from 'bullmq';
-import IORedis from 'ioredis';
+import { Redis } from 'ioredis';
 import { env } from '../config/env.js';
 
 /**
@@ -36,7 +36,7 @@ export const JOB_PRIORITIES = {
  * Отримати Redis з'єднання для BullMQ
  */
 function getRedisConnection() {
-    const redis = new IORedis(env.REDIS_URL, {
+    const redis = new Redis(env.REDIS_URL, {
         maxRetriesPerRequest: null,
         enableReadyCheck: false,
     });

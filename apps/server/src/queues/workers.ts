@@ -1,5 +1,5 @@
 import { Worker, Job, ConnectionOptions } from 'bullmq';
-import IORedis from 'ioredis';
+import { Redis } from 'ioredis';
 import { env } from '../config/env.js';
 import { sendNotification, scheduleNotification } from '../services/notification.service.js';
 import { prisma } from '../config/database.js';
@@ -9,7 +9,7 @@ import { format, addHours, subHours } from 'date-fns';
  * Отримати Redis з'єднання для воркерів
  */
 function getRedisConnection(): ConnectionOptions {
-    const redis = new IORedis(env.REDIS_URL, {
+    const redis = new Redis(env.REDIS_URL, {
         maxRetriesPerRequest: null,
         enableReadyCheck: false,
     });
