@@ -1,0 +1,44 @@
+# Koyeb Deployment Configuration
+# Deploy with: koyeb app init --config koyeb.yaml
+# Or manually import in Koyeb dashboard
+
+name: massage-bot-api
+
+# Use Docker for deployment
+type: docker
+
+docker:
+  dockerfile: ./apps/server/Dockerfile
+
+# Environment variables (set these in Koyeb dashboard)
+# Required:
+# - DATABASE_URL: postgresql://... (from Supabase)
+# - REDIS_URL: rediss://... (from Upstash)
+# - BOT_TOKEN: your-telegram-bot-token
+# - JWT_SECRET: your-jwt-secret-min-32-chars
+# - WEBAPP_URL: https://your-app.vercel.app
+# - BOT_WEBHOOK_URL: https://your-api.koyeb.app
+# - CORS_ORIGIN: https://your-app.vercel.app
+
+# Health check path
+healthcheck:
+  path: /health
+  port: 3000
+
+# Exposed port
+ports:
+  - port: 3000
+    protocol: http
+
+# Regions (Koyeb supports: fra, par, was, sin, ty)
+regions:
+  - fra
+
+# Instance type (free tier)
+instance_types:
+  - free
+
+# Scaling (1 instance for free tier)
+scalings:
+  - min: 1
+    max: 1
