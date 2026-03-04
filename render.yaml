@@ -1,9 +1,8 @@
 # Render Blueprint Configuration
 # This file configures the Massage Bot backend service on Render
-# For Deploy Hooks: Settings > Deploy Hooks in Render Dashboard
 
 services:
-  # Backend Web Service
+  # Backend Web Service (includes workers via imports)
   - type: web
     name: massage-bot-api
     runtime: node
@@ -13,7 +12,7 @@ services:
     rootDir: .
     buildCommand: |
       npm install -g pnpm@9 && \
-      pnpm install --frozen-lockfile && \
+      pnpm install && \
       cd apps/server && \
       pnpm db:generate && \
       pnpm build
@@ -28,44 +27,13 @@ services:
         fromDatabase:
           name: massage-bot-db
           property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: massage-bot-redis
-          property: connectionString
+      # Redis URL - set manually in Render Dashboard Environment Variables
+      # REDIS_URL: rediss://... (from Upstash or other Redis provider)
       # Secrets to be set in Render Dashboard:
       # - TELEGRAM_BOT_TOKEN
       # - JWT_SECRET
       # - WEBAPP_URL
       # - ADMIN_TELEGRAM_ID
-
-  # Background Worker for BullMQ
-  - type: worker
-    name: massage-bot-worker
-    runtime: node
-    region: frankfurt
-    plan: standard
-    branch: master
-    rootDir: .
-    buildCommand: |
-      npm install -g pnpm@9 && \
-      pnpm install --frozen-lockfile && \
-      cd apps/server && \
-      pnpm db:generate && \
-      pnpm build
-    startCommand: cd apps/server && pnpm start
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: massage-bot-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: massage-bot-redis
-          property: connectionString
 
 # PostgreSQL Database
 databases:
@@ -73,10 +41,3 @@ databases:
     region: frankfurt
     plan: standard
     postgresMajorVersion: 16
-
-# Redis Instance for BullMQ & Sessions
-redis:
-  - name: massage-bot-redis
-    region: frankfurt
-    plan: standard
-    maxmemoryPolicy: allkeys-lru
